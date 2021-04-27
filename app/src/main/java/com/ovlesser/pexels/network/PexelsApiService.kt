@@ -26,7 +26,13 @@ interface PexelsApiService {
     @Headers("Authorization:563492ad6f917000010000011a5094093e6e4ee3978287979ad139ac")
     fun getData(@Query("query") keyword: String,
                 @Query("page") pageIndex: Int = 0,
-                @Query("per_page") perPage: Int = 100): Call<Data>
+                @Query("per_page") perPage: Int = 20): Call<Data>
+
+    @GET("search")
+    @Headers("Authorization:563492ad6f917000010000011a5094093e6e4ee3978287979ad139ac")
+    suspend fun getDataCoroutine(@Query("query") keyword: String,
+                                 @Query("page") pageIndex: Int = 0,
+                                 @Query("per_page") perPage: Int = 20): Data
 }
 
 object PexelApi {

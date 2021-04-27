@@ -3,11 +3,13 @@ package com.ovlesser.pexels.ui.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ovlesser.pexels.data.Data
 import com.ovlesser.pexels.data.sampleData
 import com.ovlesser.pexels.network.PexelApi
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -23,7 +25,8 @@ class HomeViewModel : ViewModel() {
 
     init {
 //        getDataFromSample()
-        getDataFromNetwork()
+//        getDataFromNetwork()
+        getDataFromNetworkCoroutine()
     }
 
     private fun getDataFromSample() {
@@ -47,5 +50,15 @@ class HomeViewModel : ViewModel() {
                 }
             }
         )
+    }
+
+    private fun getDataFromNetworkCoroutine() {
+        viewModelScope.launch {
+            try {
+                _data.value = PexelApi.retrofitService.getDataCoroutine(keyword = "panda")
+            } catch (e: Exception) {
+                _data.value = Data(0, 0, emptyList(), 0, "")
+            }
+        }
     }
 }
