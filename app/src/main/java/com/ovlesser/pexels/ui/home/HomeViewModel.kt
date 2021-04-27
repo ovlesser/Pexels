@@ -1,6 +1,7 @@
 package com.ovlesser.pexels.ui.home
 
 import android.app.Application
+import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.ovlesser.pexels.data.Data
 import com.ovlesser.pexels.data.sampleData
@@ -88,12 +89,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun refreshRepository() {
+    fun refreshRepository() {
         val keyword = "panda"
+        val nextPageUri = data.value?.nextPage?.toUri()
+        val pageIndex = nextPageUri?.getQueryParameter("page")?.toInt() ?: 0
         _status.value = PexelsApiStatus.LOADING
         viewModelScope.launch {
             try {
-                pexelsPhotoRepository.refreshPexelsPhoto(keyword)
+                pexelsPhotoRepository.refreshPexelsPhoto(keyword, pageIndex = pageIndex)
                 _response.value = "Success: Pexel data about ${keyword} is fetched"
                 _status.value = PexelsApiStatus.DONE
             } catch (e: Exception) {

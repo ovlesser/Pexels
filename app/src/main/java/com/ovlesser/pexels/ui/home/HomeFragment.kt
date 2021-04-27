@@ -34,7 +34,7 @@ class HomeFragment : Fragment() {
         // Giving the binding access to the OverviewViewModel
         binding.viewModel = homeViewModel
 
-        binding.photosGrid.adapter = PhotoGridAdapter()
+        binding.photosGrid.adapter = PhotoGridAdapter() {homeViewModel.refreshRepository()}
 
         return binding.root
     }

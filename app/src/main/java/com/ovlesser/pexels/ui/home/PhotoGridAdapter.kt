@@ -1,6 +1,7 @@
 package com.ovlesser.pexels.ui.home
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -8,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ovlesser.pexels.data.Data
 import com.ovlesser.pexels.databinding.GridViewItemBinding
 
-class PhotoGridAdapter: ListAdapter<Data.Photo, PhotoGridAdapter.PhotoGridViewHolder>(DiffCallback) {
+class PhotoGridAdapter(private val onScrollToBottom: () -> Unit): ListAdapter<Data.Photo, PhotoGridAdapter.PhotoGridViewHolder>(DiffCallback) {
 
     class PhotoGridViewHolder(private var binding: GridViewItemBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(photo: Data.Photo) {
@@ -23,6 +24,9 @@ class PhotoGridAdapter: ListAdapter<Data.Photo, PhotoGridAdapter.PhotoGridViewHo
 
     override fun onBindViewHolder(holder: PhotoGridViewHolder, position: Int) {
         val photo = getItem(position)
+        if (position == itemCount - 1) {
+            onScrollToBottom()
+        }
         holder.bind(photo)
     }
 
