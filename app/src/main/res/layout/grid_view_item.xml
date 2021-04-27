@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="photo"
+            type="com.ovlesser.pexels.data.Data.Photo" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:minHeight="100dp">
+
+        <ImageView
+            android:id="@+id/pexel_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="100dp"
+            android:minWidth="100dp"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
+            app:imageUrl="@{photo.src.medium}"
+            android:background="@color/teal_700"
+            tools:src="@tools:sample/backgrounds/scenic"/>
+
+    </FrameLayout>
+</layout>
