@@ -1,12 +1,12 @@
 package com.ovlesser.pexels.ui.home
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.app.Application
+import androidx.lifecycle.*
 import com.ovlesser.pexels.data.Data
 import com.ovlesser.pexels.data.sampleData
+import com.ovlesser.pexels.database.getDatabase
 import com.ovlesser.pexels.network.PexelApi
+import com.ovlesser.pexels.repository.PexelsPhotoRepository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.launch
@@ -16,7 +16,9 @@ import retrofit2.Response
 
 enum class PexelsApiStatus { LOADING, ERROR, DONE}
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val pexelsPhotoRepository = PexelsPhotoRepository(getDatabase(application))
 
     // The internal MutableLiveData Data that stores the most recent data
     private val _data = MutableLiveData<Data>()
@@ -24,8 +26,7 @@ class HomeViewModel : ViewModel() {
     private val _status = MutableLiveData<PexelsApiStatus>()
 
     // The external immutable LiveData for the response Data
-    val data: LiveData<Data>
-        get() = _data
+    val data = pexelsPhotoRepository.data
 
     val response: LiveData<String>
         get() = _response
@@ -36,7 +37,8 @@ class HomeViewModel : ViewModel() {
     init {
 //        getDataFromSample()
 //        getDataFromNetwork()
-        getDataFromNetworkCoroutine()
+//        getDataFromNetworkCoroutine()
+        refreshRepository()
     }
 
     private fun getDataFromSample() {
@@ -83,6 +85,32 @@ class HomeViewModel : ViewModel() {
                 _response.value = "Failure: ${e.message}"
                 _status.value = PexelsApiStatus.ERROR
             }
+        }
+    }
+
+    private fun refreshRepository() {
+        val keyword = "panda"
+        _status.value = PexelsApiStatus.LOADING
+        viewModelScope.launch {
+            try {
+                pexelsPhotoRepository.refreshPexelsPhoto(keyword)
+                _response.value = "Success: Pexel data about ${keyword} is fetched"
+                _status.value = PexelsApiStatus.DONE
+            } catch (e: Exception) {
+                _data.value = Data(0, 0, emptyList(), 0, "")
+                _response.value = "Failure: ${e.message}"
+                _status.value = PexelsApiStatus.ERROR
+            }
+        }
+    }
+
+    class Factory(val app: Application): ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return HomeViewModel(app) as T
+            }
+            throw IllegalArgumentException("Unable to construct viewmodel")
         }
     }
 }

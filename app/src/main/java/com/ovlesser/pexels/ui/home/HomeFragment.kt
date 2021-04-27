@@ -14,7 +14,11 @@ import com.ovlesser.pexels.databinding.FragmentHomeBinding
 class HomeFragment : Fragment() {
 
     private val homeViewModel: HomeViewModel by lazy {
-        ViewModelProvider(this).get(HomeViewModel::class.java)
+        val activity = requireNotNull( this.activity) {
+            "You can only access the viewModel after onActivityCreated()"
+        }
+        ViewModelProvider(this, HomeViewModel.Factory(activity.application))
+            .get(HomeViewModel::class.java)
     }
 
     override fun onCreateView(
