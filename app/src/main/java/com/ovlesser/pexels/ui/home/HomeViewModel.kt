@@ -14,14 +14,24 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+enum class PexelsApiStatus { LOADING, ERROR, DONE}
+
 class HomeViewModel : ViewModel() {
 
     // The internal MutableLiveData Data that stores the most recent data
     private val _data = MutableLiveData<Data>()
+    private val _response = MutableLiveData<String>()
+    private val _status = MutableLiveData<PexelsApiStatus>()
 
     // The external immutable LiveData for the response Data
     val data: LiveData<Data>
         get() = _data
+
+    val response: LiveData<String>
+        get() = _response
+
+    val status: LiveData<PexelsApiStatus>
+        get() = _status
 
     init {
 //        getDataFromSample()
@@ -36,28 +46,42 @@ class HomeViewModel : ViewModel() {
         val jsonAdapter = moshi.adapter(Data::class.java)
         val sampleData = jsonAdapter.fromJson(sampleData)
         _data.value = sampleData ?: Data(0, 0, emptyList(), 0, "")
+        _response.value = "Success: init with sample data"
+        _status.value = PexelsApiStatus.DONE
     }
 
     private fun getDataFromNetwork() {
-        PexelApi.retrofitService.getData(keyword = "panda").enqueue(
+        val keyword = "panda"
+        _status.value = PexelsApiStatus.LOADING
+        PexelApi.retrofitService.getData(keyword = keyword).enqueue(
             object: Callback<Data> {
                 override fun onResponse(call: Call<Data>, response: Response<Data>) {
                     _data.value = response.body()
+                    _response.value = "Success: Pexel data about ${keyword} is fetched"
+                    _status.value = PexelsApiStatus.DONE
                 }
 
                 override fun onFailure(call: Call<Data>, t: Throwable) {
                     _data.value = Data(0, 0, emptyList(), 0, "")
+                    _response.value = "Failure: ${t.message}"
+                    _status.value = PexelsApiStatus.ERROR
                 }
             }
         )
     }
 
     private fun getDataFromNetworkCoroutine() {
+        val keyword = "panda"
+        _status.value = PexelsApiStatus.LOADING
         viewModelScope.launch {
             try {
-                _data.value = PexelApi.retrofitService.getDataCoroutine(keyword = "panda")
+                _data.value = PexelApi.retrofitService.getDataCoroutine(keyword = keyword)
+                _response.value = "Success: Pexel data about ${keyword} is fetched"
+                _status.value = PexelsApiStatus.DONE
             } catch (e: Exception) {
                 _data.value = Data(0, 0, emptyList(), 0, "")
+                _response.value = "Failure: ${e.message}"
+                _status.value = PexelsApiStatus.ERROR
             }
         }
     }
