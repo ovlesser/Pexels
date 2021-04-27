@@ -11,6 +11,9 @@ interface PexelsPhotoDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(photos: List<DatabasePexelsPhoto>)
+
+    @Query("delete from databasepexelsphoto")
+    fun clearAll()
 }
 
 @Database(entities = [DatabasePexelsPhoto::class], version = 1)

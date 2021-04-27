@@ -35,4 +35,10 @@ class PexelsPhotoRepository(private val database: PexelsPhotoDatabase) {
         }
         _data.value = data
     }
+
+    suspend fun clearDatabase() {
+        withContext(Dispatchers.IO) {
+            database.pexelsPhotoDao.clearAll()
+        }
+    }
 }
