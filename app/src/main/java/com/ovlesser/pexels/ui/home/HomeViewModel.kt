@@ -25,6 +25,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _data = MutableLiveData<Data>()
     private val _response = MutableLiveData<String>()
     private val _status = MutableLiveData<PexelsApiStatus>()
+    private val _selectedPhoto = MutableLiveData<Data.Photo?>()
 
     // The external immutable LiveData for the response Data
     val data = pexelsPhotoRepository.data
@@ -34,6 +35,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     val status: LiveData<PexelsApiStatus>
         get() = _status
+
+    val selectedPhoto: LiveData<Data.Photo?>
+        get() = _selectedPhoto
 
     init {
 //        getDataFromSample()
@@ -130,6 +134,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun updateKeyword( keyword: String) {
         clearDataFromDatabase()
         refreshRepository(keyword)
+    }
+
+    fun displayPhotoDetails( photo: Data.Photo) {
+        _selectedPhoto.value = photo
+    }
+
+    fun displayPhotoDetailComplete() {
+        _selectedPhoto.value = null
     }
 
     class Factory(val app: Application): ViewModelProvider.Factory {

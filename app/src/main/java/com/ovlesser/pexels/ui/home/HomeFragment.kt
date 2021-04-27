@@ -9,6 +9,7 @@ import androidx.appcompat.app.ActionBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.ovlesser.pexels.R
 import com.ovlesser.pexels.databinding.FragmentHomeBinding
 
@@ -37,7 +38,17 @@ class HomeFragment : Fragment(), androidx.appcompat.widget.SearchView.OnQueryTex
         // Giving the binding access to the OverviewViewModel
         binding.viewModel = homeViewModel
 
-        binding.photosGrid.adapter = PhotoGridAdapter() {homeViewModel.refreshRepository()}
+        binding.photosGrid.adapter = PhotoGridAdapter( PhotoGridAdapter.OnClickListener {
+            homeViewModel.displayPhotoDetails(it)
+        }) {homeViewModel.refreshRepository()}
+
+        homeViewModel.selectedPhoto.observe(viewLifecycleOwner, Observer {
+            if (it != null) {
+                this.findNavController().navigate(
+                    HomeFragmentDirections.actionShowDetail(it))
+                homeViewModel.displayPhotoDetailComplete()
+            }
+        })
 
         return binding.root
     }
