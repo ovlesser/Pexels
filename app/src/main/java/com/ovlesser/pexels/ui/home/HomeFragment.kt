@@ -40,7 +40,7 @@ class HomeFragment : Fragment(), androidx.appcompat.widget.SearchView.OnQueryTex
 
         binding.photosGrid.adapter = PhotoGridAdapter( PhotoGridAdapter.OnClickListener {
             homeViewModel.displayPhotoDetails(it)
-        }) {homeViewModel.refreshRepository()}
+        }) {homeViewModel.refreshRepository(keyword)}
 
         homeViewModel.selectedPhoto.observe(viewLifecycleOwner, Observer {
             if (it != null) {
