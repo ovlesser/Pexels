@@ -5,8 +5,10 @@ import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.ovlesser.pexels.data.Data
 import com.ovlesser.pexels.data.sampleData
+import com.ovlesser.pexels.database.PexelsPhotoDao
 import com.ovlesser.pexels.database.getDatabase
 import com.ovlesser.pexels.network.PexelApi
+import com.ovlesser.pexels.network.PexelsApiService
 import com.ovlesser.pexels.repository.PexelsPhotoRepository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -17,9 +19,9 @@ import retrofit2.Response
 
 enum class PexelsApiStatus { LOADING, ERROR, DONE}
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
+class HomeViewModel(apiService: PexelsApiService? = null, dao: PexelsPhotoDao? = null, application: Application) : AndroidViewModel(application) {
 
-    private val pexelsPhotoRepository = PexelsPhotoRepository(getDatabase(application))
+    private val pexelsPhotoRepository = PexelsPhotoRepository(apiService = apiService, dao = dao ?: getDatabase(application).pexelsPhotoDao)
 
     // The internal MutableLiveData Data that stores the most recent data
     private val _data = MutableLiveData<Data>()
@@ -148,7 +150,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return HomeViewModel(app) as T
+                return HomeViewModel(application = app) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }
